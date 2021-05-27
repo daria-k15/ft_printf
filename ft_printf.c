@@ -23,10 +23,10 @@ int	get_spec(const char *format, va_list ap)
 		return (0);
 	return (1);
 }
-void	ft_putnbr_fd(int n)
+void	ft_putnbr(long long int n)
 {
 	int	i;
-	int	nb[11];
+	long long int	nb[20];
 
 	i = 0;
 	if (n == 0)
@@ -49,14 +49,45 @@ void	ft_putnbr_fd(int n)
 			write(1, &nb[i], 1);
 	}
 }
+static int	ft_num(int n)
+{
+	int	i;
 
+	i = 0;
+	while (n > 0)
+	{
+		n = n / 10;
+		i++;
+	}
+	return (i);
+}
+char ft_putX (unsigned long long int n, int base, char x)
+{
+	int i;
+	char *nbr;
+
+	i = ft_num(n);
+	nbr = (char *)malloc(i + 1);
+	if (!nbr)
+		return (0);
+	nbr[i] = '\0';
+	while (i-- > 0)
+	{
+		if (x == 'x')
+			nbr[i] = (n % base) + (n % base > 9 ? 'a' - 10 : '0');
+		else
+			nbr[i] = (n % base) + (n % base > 9 ? 'A' - 10 : '0');
+		n /= base;
+	}
+	return (nbr);
+}
 
 int	ft_printf(const char *format, ...)
 {
 	va_list	ap;
 	int		i, j;
-	t_specif	*list;
-	list = NULL;
+	//t_specif	*list;
+	//list = NULL;
 	i = 0;
 	j = 0;
 	if (!format)
@@ -64,6 +95,7 @@ int	ft_printf(const char *format, ...)
 	va_start (ap, format);
 	char *s;
 	int d;
+	unsigned int u;
 	while (format[i] != '\0')
 	{
 		if (format[i] == '%' && format[i + 1] != '%')
@@ -85,10 +117,20 @@ int	ft_printf(const char *format, ...)
 				write (1, &s, 1);
 				
 			}
-			else if (format[i] == 'd')
+			else if (format[i] == 'd' || format[i] == 'i')
 			{
 				d = va_arg (ap, int);
-				ft_putnbr_fd(d);
+				ft_putnbr(d);
+			}
+			else if (format[i] == 'u')
+			{
+				u = va_arg (ap, int);
+				ft_putnbr(u);
+			}
+			else if (format[i] == 'X' || format[i] == 'x')
+			{
+				d = va_arg(ap, int);
+				ft_putX(d, 16, format[i]);
 			}
 		}
 		else
@@ -101,11 +143,14 @@ int	ft_printf(const char *format, ...)
 
 int	main(void)
 {
-	ft_printf("%%%  %s %c %%%%  %s %s %d", "qwerty",'g', "hey", "there", 1458796);
-	printf("\n");
-	ft_printf("%c", 'p');
-	printf("\n");
-	ft_printf("%d", 45789685);
+	//ft_printf("%%%  %s %c %%%%  %s %s %d", "qwerty",'g', "hey", "there", 1458796);
+	//printf("\n");
+	//ft_printf("%i\n", -567896);
+	//printf("%u\n", -42949672);
+	//ft_printf("%u\n", -42949672);
+	//ft_printf("%c\n", 'p');
+	//ft_printf("%d\n", 45789685);
 	
-	//printf("%c", 'cfd');
+	printf("%X\n",78564568);
+	ft_printf("%X", 78564568);
 }
