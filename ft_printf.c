@@ -10,19 +10,6 @@ size_t	ft_strlen(const char *str)
 	return (i);
 }
 
-int	get_spec(const char *format, va_list ap)
-{
-	int i;
-	i = 1;
-	if (format[i + 2] == 's')
-	{
-		while (va_arg(ap, char *) != '\0')
-			write(1, &format[i], 1);
-	}
-	else 
-		return (0);
-	return (1);
-}
 void	ft_putnbr(long long int n)
 {
 	int	i;
@@ -49,39 +36,84 @@ void	ft_putnbr(long long int n)
 			write(1, &nb[i], 1);
 	}
 }
-static int	ft_num(int n)
+static int	ft_num(unsigned int n, int base)
 {
 	int	i;
 
 	i = 0;
+	if (n < 0)
+	{
+		n = n * (-1);
+	}
 	while (n > 0)
 	{
-		n = n / 10;
+		n = n / base;
 		i++;
 	}
 	return (i);
 }
-char ft_putX (unsigned long long int n, int base, char x)
+char *ft_putX (unsigned int n, int base, char x)
 {
 	int i;
 	char *nbr;
 
-	i = ft_num(n);
+	i = ft_num(n, base);
 	nbr = (char *)malloc(i + 1);
 	if (!nbr)
 		return (0);
 	nbr[i] = '\0';
-	while (i-- > 0)
+	i--;
+	while (n > 0)
 	{
 		if (x == 'x')
-			nbr[i] = (n % base) + (n % base > 9 ? 'a' - 10 : '0');
+		{
+			if (n % base > 9)
+				nbr[i] = (n % base) + 'a' - 10;
+			else
+				nbr[i] = (n % base) + '0';
+		}
 		else
-			nbr[i] = (n % base) + (n % base > 9 ? 'A' - 10 : '0');
+		{
+			if (n % base > 9)
+				nbr[i] = (n % base) + 'A' - 10;
+			else
+				nbr[i] = (n % base) + '0';
+		}
 		n /= base;
+		i--;
 	}
-	return (nbr);
+	int j = 0;
+	while (nbr[j] != '\0')
+	{
+		write (1, &nbr[j], 1);
+		j++;
+	}
+	return (0);
 }
 
+void print_spec_s(t_specif type, va_list ap)
+{
+
+}
+int	get_spec(const char *format, va_list ap)
+{
+	int i;
+	i = 0;
+
+	char *s;
+	if (*format == 's')
+	{
+
+		s = va_arg (ap, char *);
+		while (s[i])
+		{
+			write(1, &s[i++], 1);
+		}
+	}
+	else 
+		return (0);
+	return (1);
+}
 int	ft_printf(const char *format, ...)
 {
 	va_list	ap;
@@ -93,15 +125,17 @@ int	ft_printf(const char *format, ...)
 	if (!format)
 		return (0);
 	va_start (ap, format);
-	char *s;
-	int d;
-	unsigned int u;
+	//char *s;
+	//int d;
+	//unsigned int u;
+	//void *p;
 	while (format[i] != '\0')
 	{
 		if (format[i] == '%' && format[i + 1] != '%')
 		{
 			i++;
-			if (format[i] == 's')
+			i = get_spec(&format[i], ap);
+			/*if (format[i] == 's')
 			{
 				s = va_arg (ap, char *);
 				while (s[j] != '\0')
@@ -129,9 +163,13 @@ int	ft_printf(const char *format, ...)
 			}
 			else if (format[i] == 'X' || format[i] == 'x')
 			{
-				d = va_arg(ap, int);
-				ft_putX(d, 16, format[i]);
+				u = va_arg(ap, int);
+				ft_putX(u, 16, format[i]);
 			}
+			else if (format[i] == 'p')
+			{
+				p = va_arg(ap, void *);
+			}*/
 		}
 		else
 			write(1, &format[i], 1);
@@ -143,7 +181,7 @@ int	ft_printf(const char *format, ...)
 
 int	main(void)
 {
-	//ft_printf("%%%  %s %c %%%%  %s %s %d", "qwerty",'g', "hey", "there", 1458796);
+	ft_printf("      %s", "qwerty");
 	//printf("\n");
 	//ft_printf("%i\n", -567896);
 	//printf("%u\n", -42949672);
@@ -151,6 +189,9 @@ int	main(void)
 	//ft_printf("%c\n", 'p');
 	//ft_printf("%d\n", 45789685);
 	
-	printf("%X\n",78564568);
-	ft_printf("%X", 78564568);
+	//printf("%x\n", 10);
+	//ft_printf("%x", 564868788);
+	//int a = 10;
+	//int *b = &a;
+	//printf("%p\n", b);
 }
