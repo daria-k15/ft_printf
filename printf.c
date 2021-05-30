@@ -367,6 +367,12 @@ void print_spec_u(t_specif spec, va_list ap)
 		*src = '\0';
 	output(src, spec);
 }
+
+void add_hash(char **src, t_specif spec)
+{
+	
+}
+
 void print_spec_xX(t_specif spec, va_list ap)
 {
 	unsigned int nb;
@@ -377,6 +383,9 @@ void print_spec_xX(t_specif spec, va_list ap)
 	prec_initialization(&src, spec);
 	if (spec.flag_zero && !spec.flag_minus && !spec.prec)
 		add_zero(&src, spec);
+	if (spec.flag_hash)
+		add_hash(&src, spec);
+
 	
 	output(src, spec);
 
@@ -435,10 +444,10 @@ int ft_printf(char *src, ...)
 int main()
 {
     //printf("|");
-	printf("%20.x", 0x1234abcdu);
+	printf("%#x", 0x1234abcdu);
     //printf("%03u",897);
     printf("|\n");
 	//printf("|");
-    ft_printf("%20.x",  0x1234abcdu);
+    ft_printf("%x",  0x1234abcdu);
     printf("|\n");
 }
