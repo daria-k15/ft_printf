@@ -1,4 +1,5 @@
 #include "printf.h"
+
 int is_norm(char c)
 {
      if (c == 'c' || c == 's' || c == 'p' || c == 'd' || c == 'i' ||
@@ -193,7 +194,77 @@ char *ft_putdi (int n)
     }
 	return (nbr);
 }
+char	*ft_itoa_u(unsigned int n)
+{
+	int		i;
+	char	*res;
+	
+	if (n == 0)
+		return (ft_strdup("0"));
+	i = ft_num(n, 10);
+	res = (char *)malloc(i + 1);
+	if (!res)
+		return (NULL);
+	res[i] = '\0';
+	i--;
+	if (n < 0)
+	{
+		res[0] = '-';
+		n = n * (-1);
+	}
+	while (n > 0)
+	{
+		res[i] = (n % 10) + '0';
+		n = n / 10;
+		i--;
+	}
+	return (res);
+}
+char	*ft_itoa_base_u(unsigned int n, int base, t_specif spec)
+{
+	int i;
+	char *nbr;
 
+	i = ft_num(n, base);
+	nbr = (char *)malloc(i + 1);
+	if (!nbr)
+		return (0);
+	nbr[i] = '\0';
+	i--;
+	while (n > 0)
+	{
+		if (spec.type == 'x')
+		{
+			if (n % base > 9)
+				nbr[i] = (n % base) + 'a' - 10;
+			else
+				nbr[i] = (n % base) + '0';
+		}
+		else
+		{
+			if (n % base > 9)
+				nbr[i] = (n % base) + 'A' - 10;
+			else
+				nbr[i] = (n % base) + '0';
+		}
+		n /= base;
+		i--;
+	}
+	return (nbr);
+}
+char	*ft_strcpy(char *dest, char *src)
+{
+	int i;
+
+	i = 0;
+	while (src[i])
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
 void output(char *src, t_specif spec)
 {
     int len;
@@ -211,6 +282,21 @@ void output(char *src, t_specif spec)
             ft_putchar(' ');
     }
     
+}
+void print_spec_c(t_specif spec, va_list ap)
+{
+	int c;
+	int len;
+
+	c = va_arg(ap, int);
+	len = 1;
+	if (!spec.flag_minus && spec.width)
+		while (len++ < spec.width)
+			ft_putchar(' ');
+	ft_putchar(c);
+	if (spec.flag_minus && spec.width)
+		while (len++ < spec.width)
+			ft_putchar(' ');
 }
 void print_spec_di(t_specif spec, int n)
 {
@@ -230,7 +316,70 @@ void print_spec_s(t_specif spec, va_list ap)
     src = ft_strdup(src);
     if (spec.prec > 0 && spec.prec <= (int)ft_strlen(src))
         src[spec.prec] = '\0';
+	if (spec.prec == -1)
+		*src = '\0';
     output(src, spec);
+}
+
+void prec_initialization(char **src, t_specif spec)
+{
+	char *str;
+	int i;
+	int len;
+
+	i = 0;
+	len = ft_strlen(*src);
+	if (spec.prec && spec.prec > len)
+	{
+		str = (char *)malloc(spec.prec + 1);
+		while (i < (spec.prec - (int)ft_strlen(*src)))
+			str[i++] = '0';
+		ft_strcpy(&str[i], *src);
+		//free(src);
+		*src = str;
+	}
+}
+void add_zero(char **src, t_specif spec)
+{
+	char *str;
+	int i;
+	int len;
+
+	i = 0;
+	len = (int)ft_strlen(*src);
+	str = (char *)malloc(len + 1);
+	while (i < (spec.width - len))
+		str[i++] = '0';
+	ft_strcpy(&str[i], *src);
+	*src = str;
+}
+void print_spec_u(t_specif spec, va_list ap)
+{
+	unsigned int nb;
+	char *src;
+
+	nb = va_arg(ap, unsigned int);
+	src = ft_itoa_u(nb);
+	prec_initialization(&src, spec);
+	if (spec.flag_zero && !spec.flag_minus && !spec.prec)
+		add_zero(&src, spec);
+	if (spec.prec == -1)
+		*src = '\0';
+	output(src, spec);
+}
+void print_spec_xX(t_specif spec, va_list ap)
+{
+	unsigned int nb;
+	char *src;
+
+	nb = va_arg(ap, unsigned int);
+	src = ft_itoa_base_u(nb, 16, spec);
+	prec_initialization(&src, spec);
+	if (spec.flag_zero && !spec.flag_minus && !spec.prec)
+		add_zero(&src, spec);
+	
+	output(src, spec);
+
 }
 void get_spec(t_specif spec, va_list ap)
 {
@@ -238,7 +387,12 @@ void get_spec(t_specif spec, va_list ap)
         print_spec_di(spec, va_arg(ap, int));
     if (spec.type == 's')
         print_spec_s(spec, ap);
-
+	if (spec.type == 'c')
+		print_spec_c(spec,ap);
+	if (spec.type == 'u')
+		print_spec_u(spec, ap);
+	if (spec.type == 'x' || spec.type == 'X')
+		print_spec_xX(spec, ap);
 }
 
 int scan_spec(char *src, va_list ap)
@@ -270,22 +424,21 @@ int ft_printf(char *src, ...)
     while (src[i])
     {
         if (src[i] == '%' && src[i + 1] != '%')
-        {
-            i += scan_spec(&src[i+1], ap);
-        }
+            i += scan_spec(&src[i + 1], ap);
         else 
-            write(1, &src[i], 1);
+            ft_putchar(src[i]);
         i++;
     }
     return (0);
 }
-#include <limits.h>
+
 int main()
 {
-    printf("|");
-    printf("%-*.*s", 15, 7,  "hello world");
+    //printf("|");
+	printf("%20.x", 0x1234abcdu);
+    //printf("%03u",897);
     printf("|\n");
-    printf("|");
-    ft_printf("%-*.*s", 15, 7,  "hello world");
+	//printf("|");
+    ft_printf("%20.x",  0x1234abcdu);
     printf("|\n");
 }

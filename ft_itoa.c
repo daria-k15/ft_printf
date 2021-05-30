@@ -51,10 +51,10 @@ char	*ft_itoa(int n)
 	int		i;
 	char	*res;
 
-	/*if (n == -2147483648)
+	if (n == -2147483648)
 		return (ft_strdup("-2147483648"));
 	else if (n == 0)
-		return (ft_strdup("0"));*/
+		return (ft_strdup("0"));
 	i = ft_num(n);
 	res = (char *)malloc(i + 1);
 	if (!res)

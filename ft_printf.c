@@ -82,12 +82,6 @@ char *ft_putX (unsigned int n, int base, char x)
 		n /= base;
 		i--;
 	}
-	int j = 0;
-	while (nbr[j] != '\0')
-	{
-		write (1, &nbr[j], 1);
-		j++;
-	}
 	return (0);
 }
 

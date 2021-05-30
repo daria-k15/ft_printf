@@ -5,7 +5,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
-# include "libft/libft.h"
+
 
 typedef struct s_specif
 {
@@ -16,7 +16,6 @@ typedef struct s_specif
 	int		flag_space;
 	int		prec;
 	int		width;
-	//int		length;
 	char	type;
 }				t_specif;
 
