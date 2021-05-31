@@ -153,7 +153,7 @@ int	ft_atoi(const char *str)
 	return (nb * sign);
 }
 
-int	ft_num(int n, int base)
+int	ft_num_u(unsigned int n, int base)
 {
 	int	i;
 
@@ -170,12 +170,29 @@ int	ft_num(int n, int base)
 	}
 	return (i);
 }
-char *ft_putdi (int n)
+int	ft_num_int(int n, int base)
+{
+	int	i;
+
+	i = 0;
+	if (n < 0)
+	{
+		n = n * (-1);
+        i++;
+	}
+	while (n > 0)
+	{
+		n = n / base;
+		i++;
+	}
+	return (i);
+}
+char *ft_itoa(int n)
 {
 	int i;
 	char *nbr;
 
-	i = ft_num(n, 10);
+	i = ft_num_int(n, 10);
 	nbr = (char *)malloc(i + 1);
 	if (!nbr)
 		return (0);
@@ -201,7 +218,7 @@ char	*ft_itoa_u(unsigned int n)
 	
 	if (n == 0)
 		return (ft_strdup("0"));
-	i = ft_num(n, 10);
+	i = ft_num_u(n, 10);
 	res = (char *)malloc(i + 1);
 	if (!res)
 		return (NULL);
@@ -225,12 +242,17 @@ char	*ft_itoa_base_u(unsigned int n, int base, t_specif spec)
 	int i;
 	char *nbr;
 
-	i = ft_num(n, base);
+	i = ft_num_u(n, base);
 	nbr = (char *)malloc(i + 1);
 	if (!nbr)
 		return (0);
 	nbr[i] = '\0';
 	i--;
+	if (n < 0)
+	{
+		nbr[0] = '-';
+		n = n * (-1);
+	}
 	while (n > 0)
 	{
 		if (spec.type == 'x')
@@ -263,6 +285,23 @@ char	*ft_strcpy(char *dest, char *src)
 		i++;
 	}
 	dest[i] = '\0';
+	return (dest);
+}
+char	*ft_strncpy(char *dest, char *src, unsigned int n)
+{
+	int i;
+
+	i = 0;
+	while (i < n && src[i] != '\0')
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	while (i < n)
+	{
+		dest[i] = '\0';
+		i++;
+	}
 	return (dest);
 }
 void output(char *src, t_specif spec)
@@ -298,14 +337,7 @@ void print_spec_c(t_specif spec, va_list ap)
 		while (len++ < spec.width)
 			ft_putchar(' ');
 }
-void print_spec_di(t_specif spec, int n)
-{
-    char *res;
 
-    res = ft_putdi(n);
-
-    output(res, spec);
-}
 void print_spec_s(t_specif spec, va_list ap)
 {
     char *src;
@@ -348,8 +380,13 @@ void add_zero(char **src, t_specif spec)
 	i = 0;
 	len = (int)ft_strlen(*src);
 	str = (char *)malloc(len + 1);
+	if (*src[0] == '-')
+		str[i++] = '-';
 	while (i < (spec.width - len))
 		str[i++] = '0';
+	if (spec.flag_minus)
+		ft_strcpy(str, *src);
+	
 	ft_strcpy(&str[i], *src);
 	*src = str;
 }
@@ -368,8 +405,37 @@ void print_spec_u(t_specif spec, va_list ap)
 	output(src, spec);
 }
 
-void add_hash(char **src, t_specif spec)
+void add_hash(char **src, t_specif spec, unsigned int nb)
 {
+	char *new;
+	int i;
+	int len;
+
+	i = 0;
+	len = ft_strlen(*src);
+	new = (char *)malloc(len + 1);
+	new[i++] = '0';
+	if ((spec.type == 'x' || spec.type == 'X') && nb > 0)
+		new[i++] = spec.type;
+	ft_strcpy(&new[i++], *src);
+	*src = new;
+}
+
+void add_plus(char **src, t_specif spec, int n)
+{
+	char *new;
+	int len;
+	int i;
+
+	i = 0;
+	len = ft_strlen(*src);
+	new = (char *)malloc(len + 1);
+	if (spec.flag_plus && n > 0)
+		new[i++] = '+';
+	else if (spec.flag_space && n > 0)
+		new[i++] = ' ';
+	ft_strcpy(&new[i], *src);
+	*src = new; 
 	
 }
 
@@ -378,22 +444,38 @@ void print_spec_xX(t_specif spec, va_list ap)
 	unsigned int nb;
 	char *src;
 
-	nb = va_arg(ap, unsigned int);
+	nb = va_arg(ap, unsigned long);
 	src = ft_itoa_base_u(nb, 16, spec);
 	prec_initialization(&src, spec);
 	if (spec.flag_zero && !spec.flag_minus && !spec.prec)
+	{
+		if(spec.flag_hash)
+			spec.width -= 2;
 		add_zero(&src, spec);
+	}
 	if (spec.flag_hash)
-		add_hash(&src, spec);
-
-	
+		add_hash(&src, spec, nb);
 	output(src, spec);
+}
 
+void print_spec_di(t_specif spec, va_list ap)
+{
+	int n;
+    char *res;
+
+	n = va_arg(ap, int);
+    res = ft_itoa(n);
+	prec_initialization(&res, spec);
+	if (spec.flag_zero && !spec.prec)
+		add_zero(&res, spec);
+	if (spec.flag_plus || spec.flag_space)
+		add_plus(&res, spec, n);
+    output(res, spec);
 }
 void get_spec(t_specif spec, va_list ap)
 {
     if (spec.type == 'd' || spec.type == 'i')
-        print_spec_di(spec, va_arg(ap, int));
+        print_spec_di(spec, ap);
     if (spec.type == 's')
         print_spec_s(spec, ap);
 	if (spec.type == 'c')
@@ -444,10 +526,14 @@ int ft_printf(char *src, ...)
 int main()
 {
     //printf("|");
-	printf("%#x", 0x1234abcdu);
+	printf("%020d",      -1024);
+	printf("|\n");
+	printf("%020i",      -1024);
     //printf("%03u",897);
     printf("|\n");
 	//printf("|");
-    ft_printf("%x",  0x1234abcdu);
+    ft_printf("%020d",      -1024);
     printf("|\n");
+	ft_printf("%020i",      -1024);
+	printf("|\n");
 }
