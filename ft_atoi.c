@@ -10,9 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
-#include <limits.h>
-#include <stdio.h>
+#include "printf.h"
 
 int	ft_atoi(const char *str)
 {
@@ -41,8 +39,4 @@ int	ft_atoi(const char *str)
 		i++;
 	}
 	return (nb * sign);
-}
-int main()
-{
-	printf("")
 }
