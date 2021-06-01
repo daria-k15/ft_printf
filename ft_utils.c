@@ -88,6 +88,8 @@ char	*ft_itoa_base_u(unsigned int n, int base, t_specif spec)
 	int i;
 	char *nbr;
 
+	if (n == 0)
+		return (ft_strdup("0"));
 	i = ft_num_u(n, base);
 	nbr = (char *)malloc(i + 1);
 	if (!nbr)

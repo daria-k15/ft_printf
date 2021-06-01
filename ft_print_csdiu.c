@@ -22,7 +22,7 @@ void print_spec_s(t_specif spec, va_list ap)
 
     src = va_arg(ap, char *);
     if (!src)
-        src = ft_strdup("null");
+        src = ft_strdup("(null)");
     src = ft_strdup(src);
     if (spec.prec > 0 && spec.prec <= (int)ft_strlen(src))
         src[spec.prec] = '\0';
@@ -37,7 +37,13 @@ void print_spec_u(t_specif spec, va_list ap)
 	char *src;
 
 	nb = va_arg(ap, unsigned int);
-	src = ft_itoa_u(nb);
+	if (nb == 0 && spec.prec == -1)
+	{
+		src = (char *)malloc(1);
+		*src = '\0';
+	}
+	else
+		src = ft_itoa_u(nb);
 	prec_initialization(&src, spec);
 	if (spec.flag_zero && !spec.flag_minus && !spec.prec)
 		add_zero(&src, spec);

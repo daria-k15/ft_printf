@@ -14,7 +14,7 @@ void add_zero(char **src, t_specif spec)
 	if (**src == '-')
 	{
 		str[i++] = **src;
-		len--;
+		//len--;
 	}
 	while (str[tmp])
 		tmp++;

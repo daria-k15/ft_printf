@@ -25,12 +25,12 @@ void find_flags(t_specif *spec, char *src)
         i++;
     }
 }
-int find_prec(char *src, va_list ap)
+int find_prec(char *src, va_list ap, t_specif spec)
 {
     int i;
 
     i = 0;
-    while (src[i] && src[i] != '.')
+    while (src[i] && src[i] != spec.type && src[i] != '.')
         i++;
     if (src[i++] == '.')
     {
