@@ -13,4 +13,4 @@ Recode stdio's printf function
 
 # Compilation
 Use Makefike to run the project
->$make
+> $>make
