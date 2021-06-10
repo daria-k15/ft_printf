@@ -10,9 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "printf.h"
-#include <unistd.h>
-#include <stdlib.h>
+#include "ft_printf.h"
 
 size_t	ft_strlen(const char *str)
 {

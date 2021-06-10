@@ -17,21 +17,25 @@ void	add_zero (char **src, t_specif *spec)
 	char	*str;
 	int		i;
 	int		len;
-	int		tmp;
 
 	i = 0;
-	tmp = 0;
 	len = (int)ft_strlen(*src);
 	str = (char *)malloc(sizeof(char *) * spec->width + 1);
 	if ((spec->flag_plus || spec->flag_space) && **src != '-')
 		len++;
 	if (**src == '-')
+	{
 		str[i++] = **src;
-	while (str[tmp])
-		tmp++;
-	while (len++ < spec->width)
-		str[i++] = '0';
-	ft_strcpy(&str[i], *src + tmp);
+		while (len++ < spec->width)
+			str[i++] = '0';
+		ft_strcpy(&str[i], *src + 1);
+	}
+	else
+	{
+		while (len++ < spec->width)
+			str[i++] = '0';
+		ft_strcpy(&str[i], *src);
+	}
 	free(*src);
 	*src = str;
 }

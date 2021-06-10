@@ -16,14 +16,16 @@ FLAGS = -Wall -Wextra -Werror
 
 HEADER = ft_printf.h
 
-%.o: %.c		
-			@$(CC) $(CFLAGS) -c $< -o $(<:.c=.o)
+%.o: %.c	$(HEADER)
+			$(CC) $(CFLAGS) -c $< -o $(<:.c=.o)
 
 $(NAME):	$(OBJS)
 			@ar rcs $(NAME) $(OBJS)
+			@echo Done!
 
 bonus:		$(NAME) $(BONOBJS)
 			@ar rcs $(NAME) $(BONOBJS)
+			@echo Done!
 
 all:		$(NAME)
 

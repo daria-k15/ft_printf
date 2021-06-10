@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "ft_printf.h"
-#include <stdio.h>
+
 void	get_spec(t_specif *spec, va_list ap)
 {
 	if (spec->type == 'd' || spec->type == 'i')
@@ -57,6 +57,7 @@ int	ft_printf(const char *src, ...)
 	i = 0;
 	len = 0;
 	va_start(ap, src);
+	spec.write_length = 0;
 	while (src[i])
 	{
 		if (src[i] == '%')

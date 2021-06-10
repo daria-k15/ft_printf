@@ -30,7 +30,8 @@ void	print_spec_di(t_specif *spec, va_list ap)
 	if (spec->prec < 0 && spec->prec != -1)
 		spec->prec = 0;
 	if (spec->flag_zero && !spec->prec && !spec->flag_minus)
-		add_zero(&res, spec);
+		if ((int)ft_strlen(res) < spec->width)
+			add_zero(&res, spec);
 	if (spec->flag_plus || spec->flag_space)
 		add_plus(&res, spec, n);
 	output(res, spec);

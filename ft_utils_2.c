@@ -40,16 +40,15 @@ void	prec_initialization(char **src, t_specif *spec)
 	len = (int)ft_strlen(*src);
 	if (spec->prec && spec->prec >= len)
 	{
+		new = (char *)malloc(sizeof(char) * spec->prec + 2);
 		if (**src == '-')
 		{
 			len--;
-			new = (char *)malloc(sizeof(char) * spec->prec + 1);
 			new[i++] = '-';
-			ft_strcpy(&new[spec->prec - len], *src);
+			ft_strcpy(&new[spec->prec - len + 1], *src + 1);
 		}
 		else
 		{
-			new = (char *)malloc(sizeof(char) * spec->prec);
 			ft_strcpy(&new[spec->prec - len], *src);
 		}
 		while (len++ < spec->prec)

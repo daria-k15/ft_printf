@@ -34,7 +34,8 @@ void	print_spec_u(t_specif *spec, va_list ap)
 		spec->prec = 0;
 	prec_initialization(&src, spec);
 	if (spec->flag_zero && !spec->flag_minus && !spec->prec)
-		add_zero(&src, spec);
+		if ((int)ft_strlen(src) < spec->width)
+			add_zero(&src, spec);
 	output(src, spec);
 	free(src);
 }
@@ -50,20 +51,19 @@ void	print_spec_x(t_specif *spec, unsigned int nb)
 	}
 	else
 		src = ft_itoa_base_ux(nb, 16);
-	if (spec->width < 0 && spec->width != -1)
+	if (spec->width < 0)
 	{
 		spec->width *= (-1);
 		spec->flag_minus = 1;
 	}
 	prec_initialization(&src, spec);
-	if (spec->flag_zero && !spec->flag_minus && !spec->prec)
-	{
-		if (spec->flag_hash && nb != 0)
-			spec->width -= 2;
-		add_zero(&src, spec);
-	}
 	if (spec->flag_hash && nb != 0)
 		add_hash(&src, spec, nb);
+	if (spec->flag_zero && !spec->flag_minus && !spec->prec)
+	{
+		if ((int)ft_strlen(src) < spec->width)
+			add_zero(&src, spec);
+	}
 	output(src, spec);
 	free(src);
 }
@@ -79,20 +79,19 @@ void	print_spec_X(t_specif *spec, unsigned int nb)
 	}
 	else
 		src = ft_itoa_base_uX(nb, 16);
-	if (spec->width < 0 && spec->width != -1)
+	if (spec->width < 0)
 	{
 		spec->width *= (-1);
 		spec->flag_minus = 1;
 	}
 	prec_initialization(&src, spec);
-	if (spec->flag_zero && !spec->flag_minus && !spec->prec)
-	{
-		if (spec->flag_hash && nb != 0)
-			spec->width -= 2;
-		add_zero(&src, spec);
-	}
 	if (spec->flag_hash && nb != 0)
 		add_hash(&src, spec, nb);
+	if (spec->flag_zero && !spec->flag_minus && !spec->prec)
+	{
+		if ((int)ft_strlen(src) < spec->width)
+			add_zero(&src, spec);
+	}
 	output(src, spec);
 	free(src);
 }
